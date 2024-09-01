@@ -2,7 +2,7 @@ import "./style.css";
 import typescriptLogo from "./typescript.svg";
 import viteLogo from "/vite.svg";
 import { setupCounter } from "./counter.ts";
-import { StandardLiveConnect } from "live-connect-js";
+import { LiveConnect, eventBus, consts } from "live-connect-js";
 
 const config = {
   appId: "a-0001",
@@ -24,7 +24,13 @@ const config = {
 };
 
 // Initialize LiveConnect
-const liveConnect = StandardLiveConnect(config as any, {}, {});
+const liveConnect = LiveConnect(
+  config as any,
+  {},
+  {},
+  "test",
+  eventBus.GlobalEventBus("test", 1000, (e) => console.log(e))
+);
 
 // // Wait for LiveConnect to be ready
 // liveConnect.ready().then(() => {
@@ -37,14 +43,19 @@ liveConnect?.push?.({
 });
 
 // Resolve identity
-liveConnect?.resolve?.((data, metadata) => {
-  console.log("Resolved data:", data);
-  console.log("Resolution metadata:", metadata);
-});
+liveConnect?.resolve?.(
+  (data, metadata) => {
+    console.log("Resolved data:", data);
+    console.log("Resolution metadata:", metadata);
+  },
+  () => {
+    console.log("something");
+  }
+);
 
 // Get the people verified ID
-const peopleVerifiedId = liveConnect.peopleVerifiedId;
-console.log("People Verified ID:", peopleVerifiedId);
+// const peopleVerifiedId = liveConnect.peopleVerifiedId;
+// console.log("People Verified ID:", peopleVerifiedId);
 
 // Send a custom event
 liveConnect?.push?.({
@@ -54,9 +65,9 @@ liveConnect?.push?.({
 // });
 
 // Error handling
-liveConnect?.eventBus?.on("__li__evt_bus", (error) => {
-  console.error("LiveConnect error:", error);
-});
+// liveConnect?.eventBus?.on("__li__evt_bus", (error) => {
+//   console.error("LiveConnect error:", error);
+// });
 
 document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
   <div>
